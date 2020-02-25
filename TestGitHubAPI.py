@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 from gitHubAPI import GitHubAPI
 
@@ -6,17 +7,22 @@ class TestGitHubAPI(unittest.TestCase):
     def setUp(self):
         self.repo = GitHubAPI("shengda567")
 
-    def test_repo_names(self):
+    @mock.patch('requests.get')
+    def test_repo_names(self, mockedReq):
+        mockedReq.return_value = ["222", "555-Project", "githubAPI", "hello-world",
+                                 "python810zsd", "SSW567A", "STpython810_repository", "Triangle567"]
+
         expect = ["222", "555-Project", "githubAPI", "hello-world",
                   "python810zsd", "SSW567A", "STpython810_repository", "Triangle567"]
-        actual = []
-        for repo_names in self.repo.get_repo_commit_dict():
-            actual.append(repo_names)
-        self.assertEqual(actual, expect)
 
-    def test_valid_response(self):
-        self.assertEqual(GitHubAPI('invalidinput1234567').response_valid(), False)
-        self.assertEqual(GitHubAPI('shengda567').response_valid(), True)
+        self.assertEqual(self.repo.get_response(), expect)
+
+
+    @mock.patch('requests.get')
+    def test_valid_response(self, mockedReq):
+        mockedReq.return_value = 200
+        #self.assertNotEqual(GitHubAPI('invalidinput1234567').get_response(), 200)
+        self.assertEqual(self.repo.get_response(), 200)
 
 if __name__ == '__main__':
     print('Running unit tests for GitHubAPI')
